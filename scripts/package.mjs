@@ -1,0 +1,18 @@
+import {cpSync,mkdirSync,rmSync,writeFileSync,existsSync} from 'node:fs';
+import path from 'node:path';
+const root=process.cwd(),out=path.join(root,'release','gorgan-warehouse');
+rmSync(out,{recursive:true,force:true});mkdirSync(out,{recursive:true});
+cpSync('.next/standalone',path.join(out,'app-runtime'),{recursive:true});
+cpSync('.next/static',path.join(out,'app-runtime','.next','static'),{recursive:true});
+cpSync('public',path.join(out,'app-runtime','public'),{recursive:true});
+rmSync(path.join(out,'app-runtime','data'),{recursive:true,force:true});
+mkdirSync(path.join(out,'runtime'),{recursive:true});
+const runtime=process.env.WINDOWS_NODE||'../runtime-download/node.exe';
+if(!existsSync(runtime))throw Error('Provide verified Windows node.exe via WINDOWS_NODE.');
+cpSync(runtime,path.join(out,'runtime','node.exe'));
+mkdirSync(path.join(out,'scripts'),{recursive:true});for(const f of ['launch.mjs','browser.mjs','stop.mjs','restore.mjs'])cpSync(path.join('scripts',f),path.join(out,'scripts',f));
+for(const f of ['START.bat','START.cmd'])cpSync(path.join('scripts',f),path.join(out,f));
+for(const [filename,script] of [['STOP.cmd','stop.mjs'],['RESTORE.cmd','restore.mjs']])writeFileSync(path.join(out,filename),['@echo off','chcp 65001 >nul',`"%~dp0runtime\\node.exe" "%~dp0scripts\\${script}" %*`,'if errorlevel 1 pause',''].join('\r\n'));
+const source=path.join(out,'source');mkdirSync(source,{recursive:true});for(const f of ['app','components','lib','public','scripts','tests','package.json','package-lock.json','tsconfig.json','next.config.ts','postcss.config.mjs','next-env.d.ts','.gitignore','README.md','docs','TEST-REPORT.md'])cpSync(f,path.join(source,f),{recursive:true});
+cpSync('docs/USER-GUIDE.fa.md',path.join(out,'README-fa.md'));cpSync('TEST-REPORT.md',path.join(out,'TEST-REPORT.md'));
+console.log(out);

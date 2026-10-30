@@ -1,0 +1,11 @@
+export type Entity = 'products'|'units'|'departments'|'employees'|'suppliers';
+export type Kind = 'initial'|'in'|'out'|'order';
+export const kinds: Record<Kind,string> = {initial:'موجودی اولیه',in:'رسید ورود',out:'حواله تحویل',order:'سفارش خرید'};
+export const entities: Record<Entity,string> = {products:'کالاها',units:'واحدهای شمارش',departments:'واحدهای سازمانی',employees:'کارکنان',suppliers:'تأمین‌کنندگان'};
+export type Row = {id:number; name:string; active:number; note?:string; unit_id?:number; unit_name?:string; department_id?:number; department_name?:string; threshold?:number; stock?:number; category?:string; location?:string; phone?:string; address?:string; personnel?:string};
+export type Doc = {id:number;kind:Kind;date:string;party:string;note:string;status:string;created_at:string;lines:Line[];employee_id?:number;supplier_id?:number;source_id?:number;reason?:string};
+export type Line = {product_id:number;name:string;unit:string;qty:number;note:string};
+export const fa = (n:number|string) => typeof n==='number'?new Intl.NumberFormat('fa-IR',{maximumFractionDigits:3}).format(n):n;
+export const today = () => new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Tehran',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+export const dateFa = (s:string) => s ? new Intl.DateTimeFormat('fa-IR',{timeZone:'Asia/Tehran',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(s.length===10?s+'T12:00:00Z':s)) : '—';
+export const code = (id:number) => String(id).padStart(6,'0');
